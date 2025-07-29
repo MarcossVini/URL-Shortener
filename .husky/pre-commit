@@ -1,0 +1,5 @@
+# Executa lint-staged para verificar arquivos staged
+npx lint-staged
+
+# Executa testes para garantir que nada foi quebrado
+npm test

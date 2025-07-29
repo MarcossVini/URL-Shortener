@@ -1,0 +1,30 @@
+# <tipo>(<escopo>): <descrição>
+#
+# Exemplo: feat(auth): adiciona middleware de autenticação JWT
+#
+# Tipos disponíveis:
+# feat     - Nova funcionalidade
+# fix      - Correção de bug
+# docs     - Documentação
+# style    - Formatação (sem mudança de código)
+# refactor - Refatoração
+# perf     - Melhoria de performance
+# test     - Testes
+# chore    - Tarefas de manutenção
+# ci       - Configurações de CI/CD
+# build    - Sistema de build
+# revert   - Reversão de commit
+#
+# Escopos sugeridos:
+# auth     - Autenticação
+# shorten  - Encurtamento de URLs
+# user     - Gerenciamento de usuários
+# db       - Banco de dados
+# api      - API endpoints
+# config   - Configurações
+#
+# Regras:
+# - Use o imperativo: "adiciona" não "adicionado" ou "adicionando"
+# - Primeira linha até 50 caracteres
+# - Corpo da mensagem até 72 caracteres por linha
+# - Descreva o "o quê" e o "porquê", não o "como"

@@ -1,0 +1,9 @@
+# Executa todos os testes antes de fazer push
+echo "🧪 Executando testes antes do push..."
+npm test
+
+# Verifica se o build está funcionando
+echo "🏗️ Verificando build..."
+npm run build
+
+echo "✅ Todos os checks passaram! Push autorizado."

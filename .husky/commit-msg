@@ -1,0 +1,2 @@
+# Valida o formato da mensagem de commit seguindo Conventional Commits
+npx --no -- commitlint --edit $1
