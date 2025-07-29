@@ -64,14 +64,54 @@ src/
 - Node.js 18+
 - PostgreSQL
 - Docker (opcional)
+- Git configurado com SSH ou token do GitHub
+
+### ⚙️ Configuração do Git (Primeiro acesso)
+
+Se for sua primeira vez usando este repositório, configure a autenticação:
+
+#### Opção 1: SSH (Recomendado)
+
+```bash
+# 1. Gere uma chave SSH (se não tiver)
+ssh-keygen -t ed25519 -C "seu-email@exemplo.com"
+
+# 2. Adicione a chave ao ssh-agent
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# 3. Copie a chave pública e adicione no GitHub
+cat ~/.ssh/id_ed25519.pub
+# Vá em GitHub > Settings > SSH Keys > New SSH Key
+```
+
+#### Opção 2: HTTPS com Token
+
+```bash
+# 1. Gere um Personal Access Token no GitHub
+# GitHub > Settings > Developer settings > Personal access tokens
+
+# 2. Configure o remote com token
+git remote set-url origin https://username:token@github.com/MarcossVini/URL-Shortener.git
+```
 
 ### Passos
 
 1. **Clone o repositório**
 
 ```bash
-git clone <repository-url>
-cd shortener
+git clone git@github.com:MarcossVini/URL-Shortener.git
+cd URL-Shortener
+```
+
+**Ou execute o setup automático:**
+
+```bash
+# Para Windows PowerShell
+.\setup.ps1
+
+# Para Linux/macOS
+chmod +x setup.sh && ./setup.sh
 ```
 
 2. **Instale as dependências**
