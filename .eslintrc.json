@@ -22,5 +22,13 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-empty-function": "warn"
   },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.spec.ts"],
+      "rules": {
+        "linebreak-style": "off"
+      }
+    }
+  ],
   "ignorePatterns": ["dist/", "node_modules/", "coverage/", "src/generated/**/*", "*.js"]
 }
