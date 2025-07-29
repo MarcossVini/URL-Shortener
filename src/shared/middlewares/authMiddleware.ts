@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
 
 interface JWTPayload {
-  userId: string;
+  sub: string; // Mudando de userId para sub (padrão JWT)
   email: string;
+  iat?: number;
+  exp?: number;
 }
 
 declare global {

@@ -4,7 +4,7 @@ import { ListUserUrlsUseCase } from './ListUserUrlsUseCase';
 export class ListUserUrlsController {
   async handle(req: Request, res: Response) {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.sub;
 
       if (!userId) {
         return res.status(401).json({ error: 'Usuário não autenticado' });
