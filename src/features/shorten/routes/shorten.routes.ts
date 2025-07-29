@@ -67,7 +67,17 @@ router.post(
  *         description: Código da URL encurtada
  *         example: abc123
  *     responses:
- *       301:
+ *       200:
+ *         description: URL encontrada (localização em JSON)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 location:
+ *                   type: string
+ *                   example: https://www.google.com
+ *       302:
  *         description: Redirecionamento para URL original
  *       404:
  *         description: URL não encontrada

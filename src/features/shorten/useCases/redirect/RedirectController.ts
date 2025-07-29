@@ -12,7 +12,13 @@ export class RedirectController {
         req.get('User-Agent') || '',
       );
 
-      return res.redirect(301, originalUrl);
+      // JSON response for Swagger UI (Accept: application/json)
+      const accept = req.get('accept') || '';
+      if (accept.includes('application/json')) {
+        return res.status(200).json({ location: originalUrl });
+      }
+
+      return res.redirect(302, originalUrl);
     } catch (error) {
       if (error instanceof Error) {
         return res.status(404).json({ error: error.message });

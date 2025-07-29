@@ -21,6 +21,16 @@ services:
       - '8080:8080'
     depends_on:
       - postgres
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: shortener_jaeger
+    restart: always
+    ports:
+      - '6831:6831/udp'
+      - '16686:16686'
+      - '14268:14268'
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: '0.0.0.0:9411'
 
 volumes:
   postgres_data:

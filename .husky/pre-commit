@@ -1,5 +1,8 @@
-# Executa lint-staged para verificar arquivos staged
-npx lint-staged
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
 
-# Executa testes para garantir que nada foi quebrado
-npm test
+# Verifica lint e formatação nos arquivos staged
+pnpm lint-staged
+
+# Executa testes para garantir integridade
+pnpm test

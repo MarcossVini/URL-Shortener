@@ -1,6 +1,11 @@
+// Inicializa tracing distribuído (OpenTelemetry)
+import './config/tracing';
+// Inicia tracing antes de qualquer outra importação para instrumentação correta
+import './config/tracing';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { metricsMiddleware, getMetricsEndpoint } from './shared/observability/metrics';
 import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env';
 import { specs } from './config/swagger';
@@ -14,10 +19,12 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+// Middleware de métricas
+app.use(metricsMiddleware);
 
 // Swagger Documentation
 app.use(
-  '/docs',
+  '/api-docs',
   swaggerUi.serve,
   swaggerUi.setup(specs, {
     customCss: '.swagger-ui .topbar { display: none }',
@@ -26,6 +33,17 @@ app.use(
 );
 
 // Rotas
+/**
+ * @swagger
+ * /metrics:
+ *   get:
+ *     summary: Expor métricas da aplicação
+ *     tags: [Observability]
+ *     responses:
+ *       200:
+ *         description: Métricas no formato JSON
+ */
+app.get('/metrics', getMetricsEndpoint);
 app.use('/auth', authRoutes);
 app.use('/shorten', shortenRoutes);
 app.use('/user', userRoutes);
@@ -52,6 +70,6 @@ app.get('/health', (req, res) => {
 app.listen(env.PORT, () => {
   console.log(`🚀 Server running on port ${env.PORT}`);
   console.log(` Environment: ${env.NODE_ENV}`);
-  console.log(`📚 API Documentation: http://localhost:${env.PORT}/docs`);
+  console.log(`📚 API Documentation: http://localhost:${env.PORT}/api-docs`);
   console.log(`🏥 Health Check: http://localhost:${env.PORT}/health`);
 });
