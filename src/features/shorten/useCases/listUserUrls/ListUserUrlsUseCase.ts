@@ -19,7 +19,7 @@ export class ListUserUrlsUseCase {
       },
     });
 
-    return urls.map((url) => ({
+    return urls.map((url: any) => ({
       id: url.id,
       original_url: url.original_url,
       short_code: url.short_code,
