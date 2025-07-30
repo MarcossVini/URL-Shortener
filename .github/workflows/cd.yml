@@ -52,8 +52,8 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/shortener:${{ github.ref_name }}
-            ghcr.io/${{ github.repository }}/shortener:latest
+            ghcr.io/${{ github.repository_owner }}/url-shortener:${{ github.ref_name }}
+            ghcr.io/${{ github.repository_owner }}/url-shortener:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
