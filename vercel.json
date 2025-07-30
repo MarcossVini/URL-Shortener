@@ -1,15 +1,11 @@
 {
   "version": 2,
   "buildCommand": "pnpm vercel-build",
-  "functions": {
-    "dist/src/server.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "routes": [
+  "outputDirectory": "dist",
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/dist/src/server.js"
+      "source": "/(.*)",
+      "destination": "/src/server.js"
     }
   ],
   "env": {
