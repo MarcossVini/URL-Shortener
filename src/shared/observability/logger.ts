@@ -3,10 +3,12 @@ import type { Request, Response, NextFunction } from 'express';
 import { env } from '../../config/env';
 
 // Extensão do tipo Request para incluir propriedades customizadas
-declare module 'express-serve-static-core' {
-  interface Request {
-    requestId?: string;
-    logger?: ContextLogger;
+declare global {
+  namespace Express {
+    interface Request {
+      requestId?: string;
+      logger?: ContextLogger;
+    }
   }
 }
 

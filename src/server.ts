@@ -67,9 +67,15 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-app.listen(env.PORT, () => {
-  console.log(`🚀 Server running on port ${env.PORT}`);
-  console.log(` Environment: ${env.NODE_ENV}`);
-  console.log(`📚 API Documentation: http://localhost:${env.PORT}/api-docs`);
-  console.log(`🏥 Health Check: http://localhost:${env.PORT}/health`);
-});
+// Expose Express app for serverless platforms (e.g., Vercel)
+export default app;
+
+// If running locally (not on Vercel), start the server
+if (!process.env.VERCEL) {
+  app.listen(env.PORT, () => {
+    console.log(`🚀 Server running on port ${env.PORT}`);
+    console.log(` Environment: ${env.NODE_ENV}`);
+    console.log(`📚 API Documentation: http://localhost:${env.PORT}/api-docs`);
+    console.log(`🏥 Health Check: http://localhost:${env.PORT}/health`);
+  });
+}
