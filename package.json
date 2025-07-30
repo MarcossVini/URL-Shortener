@@ -23,7 +23,8 @@
     "prepare": "if [ \"$VERCEL\" != \"1\" ]; then husky install || true; fi",
     "commit": "git add . && git cz",
     "release": "standard-version",
-    "vercel-build": "npx prisma generate && pnpm build"
+    "vercel-build": "npx prisma generate && pnpm build",
+    "postinstall": "npx prisma generate"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -60,7 +61,8 @@
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "winston": "^3.17.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -69,7 +71,6 @@
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitest/coverage-v8": "^3.2.4",
-    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",

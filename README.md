@@ -1,279 +1,578 @@
 # 🚀 Shortener API
 
-API completa para encurtamento de URLs com autenticação JWT e gerenciamento de usuários.
+API completa para encurtamento de URLs com autenticação JWT, gerenciamento de usuários e observabilidade integrada.
 
-> ✅ **Status**: Deployment v1.0.20+ com correções aplicadas
+> ✅ **Status**: Deployment v1.2.0+ - Funcionando em produção no Vercel
+>
+> 🌐 **Live Demo**: [https://url-shortener-hazel-rho.vercel.app](https://url-shortener-hazel-rho.vercel.app)
 
 ## 📋 Índice
 
 - [Funcionalidades](#-funcionalidades)
 - [Tecnologias](#-tecnologias)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Instalação](#-instalação)
+- [Como Rodar Localmente](#-como-rodar-localmente)
 - [Configuração](#-configuração)
-- [Uso](#-uso)
-- [API Endpoints](#-api-endpoints)
+- [Uso da API](#-uso-da-api)
+- [Endpoints](#-endpoints)
 - [Documentação](#-documentação)
 - [Testes](#-testes)
 - [Deploy](#-deploy)
+- [Observabilidade](#-observabilidade)
+- [Contribuição](#-contribuição)
 
 ## ✨ Funcionalidades
 
-- **🔐 Autenticação JWT**: Login seguro com tokens
-- **✂️ Encurtamento de URLs**: Criação de links curtos
+- **🔐 Autenticação JWT**: Login seguro com tokens Bearer
+- **✂️ Encurtamento de URLs**: Criação de links curtos de até 6 caracteres
 - **🔄 Redirecionamento**: Redirecionamento automático para URLs originais
 - **📊 Gerenciamento de URLs**: CRUD completo para usuários autenticados
-- **📈 Contabilização**: Rastreamento de cliques e acessos
-- **📚 Documentação Interativa**: Swagger UI para testes
+- **📈 Contabilização de Cliques**: Rastreamento detalhado de acessos
+- **🔍 Listagem Personalizada**: URLs do usuário com estatísticas
+- **📚 Documentação Interativa**: Swagger UI integrada
+- **📊 Observabilidade**: Logs estruturados, métricas e tracing
+- **🛡️ Validação Robusta**: Validação de entrada com Zod
+- **🔒 Soft Delete**: Exclusão lógica de registros
+- **⚡ Serverless Ready**: Otimizado para deploy em Vercel
 
 ## 🛠️ Tecnologias
 
-- **Runtime**: Node.js + TypeScript
-- **Framework**: Express.js
-- **ORM**: Prisma
-- **Banco**: PostgreSQL
-- **Autenticação**: JWT
-- **Documentação**: Swagger/OpenAPI
-- **Containerização**: Docker + Docker Compose
+### Core Stack
+
+- **Runtime**: Node.js 18+ com TypeScript 5.8+
+- **Framework**: Express.js 4.19.2
+- **ORM**: Prisma 6.12.0 com PostgreSQL
+- **Autenticação**: JWT com bcrypt
+
+### Qualidade e Desenvolvimento
+
+- **Testes**: Vitest + Supertest
+- **Linting**: ESLint + Prettier
+- **Git Hooks**: Husky + lint-staged
+- **Commits**: Commitlint (Conventional Commits)
+
+### Observabilidade
+
+- **Logs**: Winston com contexto estruturado
+- **Métricas**: Coleta personalizada de métricas HTTP
+- **Tracing**: OpenTelemetry com Jaeger
+- **Documentação**: Swagger/OpenAPI 3.0
+
+### Deploy e Infraestrutura
+
+- **Produção**: Vercel (Serverless)
+- **Banco**: Neon PostgreSQL (Serverless)
+- **Desenvolvimento**: Docker + Docker Compose
+- **CI/CD**: GitHub Actions
 
 ## 📁 Estrutura do Projeto
 
 ```
 src/
-├── config/                 # Configurações
-│   ├── env.ts             # Variáveis de ambiente
-│   └── swagger.ts         # Configuração Swagger
-├── features/              # Funcionalidades por domínio
-│   ├── auth/              # Autenticação
-│   │   ├── dto/
-│   │   ├── useCases/
-│   │   └── routes/
-│   └── shorten/           # Encurtamento de URLs
-│       ├── dto/
-│       ├── entities/
-│       ├── useCases/
-│       └── routes/
-├── shared/                # Código compartilhado
-│   ├── middlewares/       # Middlewares
-│   └── utils/             # Utilitários
-└── server.ts              # Servidor principal
+├── config/                     # Configurações
+│   ├── env.ts                 # Variáveis de ambiente com validação
+│   ├── swagger.ts             # Configuração OpenAPI/Swagger
+│   └── tracing.ts             # OpenTelemetry setup
+├── database/
+│   └── prisma.ts              # Cliente Prisma configurado
+├── features/                   # Funcionalidades por domínio
+│   ├── auth/                  # Sistema de autenticação
+│   │   ├── dto/               # Data Transfer Objects
+│   │   ├── useCases/          # Regras de negócio
+│   │   └── routes/            # Rotas HTTP
+│   ├── shorten/               # Encurtamento de URLs
+│   │   ├── dto/               # Validações de entrada
+│   │   ├── entities/          # Entidades de domínio
+│   │   ├── repositories/      # Camada de dados
+│   │   ├── useCases/          # Casos de uso
+│   │   └── routes/            # Rotas da API
+│   └── users/                 # Gerenciamento de usuários
+├── shared/                     # Código compartilhado
+│   ├── middlewares/           # Middlewares personalizados
+│   ├── observability/         # Logs, métricas e tracing
+│   ├── tests/                 # Testes integrados
+│   └── utils/                 # Utilitários
+└── server.ts                  # Servidor principal
 ```
 
-## 🚀 Instalação
+## 🚀 Como Rodar Localmente
 
 ### Pré-requisitos
 
-- Node.js 18+
-- PostgreSQL
-- Docker (opcional)
-- Git configurado com SSH ou token do GitHub
+- **Node.js**: 18.0.0 ou superior
+- **PNPM**: 8.0.0 ou superior (gerenciador de pacotes)
+- **PostgreSQL**: 16+ ou Docker
+- **Git**: Para clonagem do repositório
 
-### ⚙️ Configuração do Git (Primeiro acesso)
-
-Se for sua primeira vez usando este repositório, configure a autenticação:
-
-#### Opção 1: SSH (Recomendado)
+### 1. Clone o Repositório
 
 ```bash
-# 1. Gere uma chave SSH (se não tiver)
-ssh-keygen -t ed25519 -C "seu-email@exemplo.com"
-
-# 2. Adicione a chave ao ssh-agent
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-
-# 3. Copie a chave pública e adicione no GitHub
-cat ~/.ssh/id_ed25519.pub
-# Vá em GitHub > Settings > SSH Keys > New SSH Key
-```
-
-#### Opção 2: HTTPS com Token
-
-```bash
-# 1. Gere um Personal Access Token no GitHub
-# GitHub > Settings > Developer settings > Personal access tokens
-
-# 2. Configure o remote com token
-git remote set-url origin https://username:token@github.com/MarcossVini/URL-Shortener.git
-```
-
-### Passos
-
-1. **Clone o repositório**
-
-```bash
-git clone git@github.com:MarcossVini/URL-Shortener.git
+git clone https://github.com/MarcossVini/URL-Shortener.git
 cd URL-Shortener
 ```
 
-**Ou execute o setup automático:**
-
-```bash
-# Para Windows PowerShell
-.\setup.ps1
-
-# Para Linux/macOS
-chmod +x setup.sh && ./setup.sh
-```
-
-2. **Instale as dependências**
+### 2. Instale as Dependências
 
 ```bash
 pnpm install
 ```
 
-3. **Configure as variáveis de ambiente**
+### 3. Configure o Banco de Dados
+
+#### Opção A: Docker (Recomendado)
+
+```bash
+# Sobe PostgreSQL, Adminer e Jaeger
+pnpm run database
+
+# Ou individualmente
+docker compose up -d postgres
+```
+
+#### Opção B: PostgreSQL Local
+
+- Instale PostgreSQL localmente
+- Crie um banco chamado `shortener`
+
+### 4. Configure as Variáveis de Ambiente
 
 ```bash
 cp .env.example .env
-# Edite o arquivo .env com suas configurações
 ```
 
-4. **Configure o banco de dados**
+Edite o arquivo `.env`:
 
-```bash
-# Com Docker (recomendado)
-pnpm run database
+```env
+# Banco de dados
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shortener"
 
-# Ou configure um PostgreSQL local
+# JWT
+JWT_SECRET="sua-chave-super-secreta-de-pelo-menos-32-caracteres"
+
+# Aplicação
+PORT=3000
+NODE_ENV=development
+BASE_URL="http://localhost:3000"
+
+# Logs (opcional)
+LOG_LEVEL=info
+
+# OpenTelemetry (opcional)
+OTEL_SERVICE_NAME=shortener-api
+OTEL_EXPORTER_JAEGER_ENDPOINT=http://localhost:14268/api/traces
 ```
 
-5. **Execute as migrações**
+### 5. Execute as Migrações
 
 ```bash
+# Gera o cliente Prisma
+pnpm prisma:generate
+
+# Executa as migrações
 pnpm prisma:dev
-```
 
-6. **Popule o banco com dados de teste**
-
-```bash
+# Popula com dados de exemplo (opcional)
 pnpm seed
 ```
 
-7. **Inicie o servidor**
+### 6. Inicie o Servidor
 
 ```bash
+# Desenvolvimento (com hot reload)
 pnpm dev
+
+# Produção
+pnpm build
+pnpm start
 ```
+
+### 7. Acesse a Aplicação
+
+- **API**: [http://localhost:3000](http://localhost:3000)
+- **Documentação**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+- **Health Check**: [http://localhost:3000/health](http://localhost:3000/health)
+- **Métricas**: [http://localhost:3000/metrics](http://localhost:3000/metrics)
+- **Adminer** (DB): [http://localhost:8080](http://localhost:8080)
+- **Jaeger** (Tracing): [http://localhost:16686](http://localhost:16686)
 
 ## ⚙️ Configuração
 
 ### Variáveis de Ambiente
 
-```env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shortener"
-JWT_SECRET="your-super-secret-jwt-key-with-at-least-32-characters"
-BASE_URL="http://localhost:3000"
-ENABLE_OBSERVABILITY=false
-LOG_LEVEL=info
+| Variável       | Descrição                          | Exemplo                               | Obrigatória |
+| -------------- | ---------------------------------- | ------------------------------------- | ----------- |
+| `DATABASE_URL` | String de conexão PostgreSQL       | `postgresql://user:pass@host:5432/db` | ✅          |
+| `JWT_SECRET`   | Chave secreta para JWT (32+ chars) | `sua-chave-secreta-muito-segura`      | ✅          |
+| `BASE_URL`     | URL base da aplicação              | `http://localhost:3000`               | ✅          |
+| `PORT`         | Porta do servidor                  | `3000`                                | ❌          |
+| `NODE_ENV`     | Ambiente de execução               | `development`, `production`           | ❌          |
+| `LOG_LEVEL`    | Nível de log                       | `error`, `warn`, `info`, `debug`      | ❌          |
+
+### Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+pnpm dev              # Inicia com hot reload
+pnpm build            # Compila TypeScript
+pnpm start            # Inicia versão compilada
+
+# Banco de dados
+pnpm database         # Sobe containers Docker
+pnpm database:down    # Para containers
+pnpm prisma:dev       # Migrations desenvolvimento
+pnpm prisma:generate  # Gera cliente Prisma
+pnpm seed             # Popula dados de exemplo
+
+# Qualidade
+pnpm test             # Executa testes
+pnpm test:coverage    # Testes com coverage
+pnpm test:ui          # Interface visual dos testes
+pnpm lint             # ESLint
+pnpm format           # Prettier
+
+# Git e Deploy
+pnpm commit           # Commit com Commitizen
+pnpm release          # Cria nova versão
 ```
 
-### Usuários de Teste
+## 📖 Uso da API
 
-Após executar `pnpm seed`, você terá acesso a:
-
-- **Admin**: `admin@example.com` / `admin123`
-- **User**: `user@example.com` / `user123`
-
-## 📖 Uso
-
-### 1. Autenticação
+### 1. Fazer Login
 
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@example.com", "password": "admin123"}'
+  -d '{
+    "email": "admin@example.com",
+    "password": "admin123"
+  }'
+```
+
+**Resposta:**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "email": "admin@example.com"
+  }
+}
 ```
 
 ### 2. Encurtar URL
 
 ```bash
-# Com autenticação
+# Com autenticação (URL fica associada ao usuário)
 curl -X POST http://localhost:3000/shorten \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <seu-token>" \
-  -d '{"original_url": "https://www.google.com"}'
+  -d '{
+    "original_url": "https://www.google.com"
+  }'
 
-# Sem autenticação
+# Sem autenticação (URL anônima)
 curl -X POST http://localhost:3000/shorten \
   -H "Content-Type: application/json" \
-  -d '{"original_url": "https://www.google.com"}'
+  -d '{
+    "original_url": "https://www.google.com"
+  }'
 ```
 
-### 3. Redirecionamento
+**Resposta:**
 
-```bash
-curl -L http://localhost:3000/shorten/<short-code>
+```json
+{
+  "short_url": "http://localhost:3000/aZbKq7",
+  "original_url": "https://www.google.com"
+}
 ```
 
-### 4. Gerenciar URLs
+### 3. Usar URL Encurtada
 
 ```bash
-# Listar URLs do usuário
+# Acesse diretamente no navegador ou via curl
+curl -L http://localhost:3000/aZbKq7
+# Redireciona automaticamente para https://www.google.com
+```
+
+### 4. Gerenciar Suas URLs
+
+```bash
+# Listar URLs do usuário com estatísticas
 curl -X GET http://localhost:3000/user/urls \
   -H "Authorization: Bearer <seu-token>"
 
-# Atualizar URL
+# Atualizar URL de destino
 curl -X PATCH http://localhost:3000/user/urls/<url-id> \
   -H "Authorization: Bearer <seu-token>" \
   -H "Content-Type: application/json" \
-  -d '{"original_url": "https://novo-site.com"}'
+  -d '{
+    "original_url": "https://novo-site.com"
+  }'
 
-# Deletar URL
+# Deletar URL (soft delete)
 curl -X DELETE http://localhost:3000/user/urls/<url-id> \
   -H "Authorization: Bearer <seu-token>"
 ```
 
-## 🔗 API Endpoints
+## 🔗 Endpoints
 
-### Autenticação
+### 🔐 Autenticação
 
-- `POST /auth/login` - Login de usuário
+- `POST /auth/login` - Fazer login e obter token JWT
 
-### Encurtamento
+### ✂️ Encurtamento
 
-- `POST /shorten` - Criar URL encurtada
-- `GET /shorten/{shortCode}` - Redirecionar para URL original
+- `POST /shorten` - Criar URL encurtada (com/sem autenticação)
+- `GET /{shortCode}` - Redirecionar para URL original
 
-### Gerenciamento (Autenticado)
+### 👤 Gerenciamento de URLs (Requer Autenticação)
 
-- `GET /user/urls` - Listar URLs do usuário
-- `PATCH /user/urls/{id}` - Atualizar URL
-- `DELETE /user/urls/{id}` - Deletar URL
+- `GET /user/urls` - Listar URLs do usuário com estatísticas
+- `PATCH /user/urls/{id}` - Atualizar URL de destino
+- `DELETE /user/urls/{id}` - Deletar URL (soft delete)
 
-### Sistema
+### 🔧 Sistema
 
-- `GET /health` - Health check
-- `GET /docs` - Documentação Swagger
+- `GET /health` - Health check da aplicação
+- `GET /metrics` - Métricas da aplicação (Prometheus)
+- `GET /` - Redireciona para documentação
+- `GET /api-docs` - Documentação Swagger UI
 
 ## 📚 Documentação
 
-A documentação interativa está disponível em:
+### 🌐 Produção
 
-**🌐 Swagger UI**: http://localhost:3000/docs
+**Swagger UI**: [https://url-shortener-hazel-rho.vercel.app/api-docs](https://url-shortener-hazel-rho.vercel.app/api-docs)
 
-### Recursos da Documentação
+### 💻 Local
 
-- ✅ **Interface interativa** para testar endpoints
-- ✅ **Exemplos de request/response**
-- ✅ **Autenticação JWT integrada**
-- ✅ **Schemas completos**
-- ✅ **Códigos de erro detalhados**
+**Swagger UI**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+### 📋 Recursos da Documentação
+
+- ✅ **Interface interativa** para testar todos os endpoints
+- ✅ **Autenticação JWT integrada** (botão "Authorize")
+- ✅ **Exemplos de request/response** completos
+- ✅ **Schemas detalhados** com validações
+- ✅ **Códigos de erro** com descrições
+- ✅ **Try it out** funcional para todos os endpoints
 
 ## 🧪 Testes
 
+### Executar Testes
+
 ```bash
-# Executar testes
+# Todos os testes
 pnpm test
 
-# Cobertura de testes
+# Com coverage
 pnpm test:coverage
 
-# Interface de testes
+# Interface visual (recomendado)
 pnpm test:ui
+
+# Apenas um arquivo
+pnpm test auth.api.test.ts
 ```
+
+### Cobertura Atual
+
+- ✅ **Testes de API**: Endpoints completos
+- ✅ **Testes de Validação**: DTOs e schemas
+- ✅ **Testes de Observabilidade**: Logs e métricas
+- ✅ **38 testes** passando
+- ✅ **Cobertura > 80%**
+
+### Tipos de Teste
+
+```bash
+src/shared/tests/
+├── auth.api.test.ts          # Testes de autenticação
+├── shorten.api.test.ts       # Testes de encurtamento
+├── user.api.test.ts          # Testes de gerenciamento
+├── dto.validation.test.ts    # Testes de validação
+└── observability.test.ts     # Testes de observabilidade
+```
+
+## 🚀 Deploy
+
+### 🌐 Produção
+
+O projeto está deployado automaticamente na Vercel:
+
+**🔗 URL Base**: [https://url-shortener-hazel-rho.vercel.app](https://url-shortener-hazel-rho.vercel.app)
+
+**📖 Swagger**: [https://url-shortener-hazel-rho.vercel.app/api-docs](https://url-shortener-hazel-rho.vercel.app/api-docs)
+
+### ⚙️ Configuração do Deploy
+
+1. **Vercel**: Serverless deployment com CI/CD automático
+2. **Neon PostgreSQL**: Banco de dados serverless na produção
+3. **Git Tags**: Deploy automático em push de tags (v1.x.x)
+
+### 🏷️ Versionamento
+
+```bash
+# Criar nova versão
+git tag v1.2.1
+git push origin v1.2.1
+
+# Deploy automático será acionado
+```
+
+### 🌍 Variáveis de Produção
+
+```env
+NODE_ENV=production
+DATABASE_URL="postgresql://..." # Neon DB
+JWT_SECRET="production-secret"
+BASE_URL="https://url-shortener-hazel-rho.vercel.app"
+```
+
+## 📊 Observabilidade
+
+### 📈 Métricas
+
+- **Endpoint**: `/metrics` (formato Prometheus)
+- **Métricas disponíveis**:
+  - Total de URLs criadas
+  - Cliques por URL
+  - Tempo de resposta das APIs
+  - Status de saúde da aplicação
+
+### 📝 Logs
+
+```bash
+# Visualizar logs
+pnpm logs
+
+# Logs estruturados com Winston
+# Arquivos: logs/combined.log, logs/error.log
+```
+
+### 🔍 Tracing
+
+- **OpenTelemetry** configurado
+- **Jaeger** para tracing distribuído (opcional)
+- **Correlação de requisições** com trace IDs
+
+### 🏥 Health Check
+
+```bash
+# Status da aplicação
+curl http://localhost:3000/health
+
+# Resposta esperada
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": 3600,
+  "database": "connected"
+}
+```
+
+## 🐳 Docker
+
+### 🔨 Build e Execução
+
+```bash
+# Build da imagem
+docker build -t url-shortener .
+
+# Executar com Docker Compose
+docker-compose up -d
+
+# Verificar status
+docker-compose ps
+```
+
+### 📋 Serviços
+
+O `docker-compose.yml` inclui:
+
+- ✅ **Aplicação Node.js** (porta 3000)
+- ✅ **PostgreSQL** (porta 5432)
+- ✅ **Volumes persistentes** para dados
+- ✅ **Rede interna** para comunicação
+
+## 🔧 Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+pnpm dev           # Servidor em modo desenvolvimento (watch)
+pnpm build         # Build de produção
+pnpm start         # Iniciar servidor de produção
+
+# Banco de Dados
+pnpm db:push       # Aplicar schema ao banco
+pnpm db:migrate    # Executar migrations
+pnpm db:studio     # Abrir Prisma Studio
+pnpm db:seed       # Popular banco com dados de teste
+pnpm db:reset      # Resetar banco completamente
+
+# Testes
+pnpm test          # Executar testes
+pnpm test:ui       # Interface de testes (Vitest UI)
+pnpm test:coverage # Testes com cobertura
+
+# Qualidade de Código
+pnpm lint          # ESLint
+pnpm format        # Prettier
+pnpm type-check    # TypeScript check
+
+# Logs e Monitoramento
+pnpm logs          # Visualizar logs
+```
+
+## 🤝 Contribuição
+
+### 📋 Workflow
+
+1. **Fork** do repositório
+2. **Clone** seu fork localmente
+3. **Branch** para sua feature: `git checkout -b feature/nova-funcionalidade`
+4. **Commit** suas mudanças: `git commit -m 'feat: adiciona nova funcionalidade'`
+5. **Push** para a branch: `git push origin feature/nova-funcionalidade`
+6. **Pull Request** no repositório principal
+
+### 🔍 Padrões
+
+- ✅ **Commits convencionais** (Commitlint)
+- ✅ **Testes obrigatórios** (Husky pre-commit)
+- ✅ **Linting automático** (ESLint + Prettier)
+- ✅ **TypeScript strict mode**
+- ✅ **Cobertura de testes > 80%**
+
+### 📝 Documentação
+
+- **Contribute**: Leia `CONTRIBUTING.md`
+- **Checklist**: Veja `PROJECT_CHECKLIST.md`
+- **Observabilidade**: `docs/OBSERVABILITY.md`
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.
+
+## 👥 Equipe
+
+- **Desenvolvedor Principal**: [Seu Nome]
+- **Tecnologias**: Node.js, TypeScript, Express, Prisma, PostgreSQL
+- **Deploy**: Vercel + Neon Database
+
+---
+
+## 🎯 Status do Projeto
+
+✅ **Completo** - Todos os requisitos implementados  
+🚀 **Produção** - Deploy ativo e funcional  
+📊 **Monitorado** - Observabilidade completa  
+🧪 **Testado** - 38 testes passando
+
+**URL Demo**: [https://url-shortener-hazel-rho.vercel.app](https://url-shortener-hazel-rho.vercel.app)
+
+````
 
 ## 🐳 Docker
 
@@ -288,7 +587,7 @@ pnpm prisma:dev
 
 # Iniciar aplicação
 pnpm dev
-```
+````
 
 ### Produção
 
