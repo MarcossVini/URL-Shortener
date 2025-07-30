@@ -23,8 +23,7 @@
     "prepare": "test \"$VERCEL\" = '1' || test \"$DOCKER\" = '1' || husky install || true",
     "commit": "git add . && git cz",
     "release": "standard-version",
-    "vercel-build": "npx prisma generate && pnpm build",
-    "postinstall": "npx prisma generate"
+    "vercel-build": "npx prisma generate && pnpm build"
   },
   "engines": {
     "node": ">=18.0.0",
