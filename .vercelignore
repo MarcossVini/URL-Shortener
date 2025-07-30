@@ -1,5 +1,4 @@
 # Development files
-src/
 .env
 .env.example
 .git/
