@@ -47,6 +47,13 @@ ENABLE_OBSERVABILITY=false
 LOG_LEVEL=info
       `);
     }
+    console.error('💥 Falha crítica na validação das variáveis de ambiente');
+
+    // Em ambiente serverless, não podemos usar process.exit()
+    if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+      throw new Error('Environment validation failed - check your environment variables');
+    }
+
     process.exit(1);
   }
 }

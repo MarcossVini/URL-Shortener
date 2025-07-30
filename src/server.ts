@@ -1,7 +1,5 @@
 // Inicializa tracing distribuído (OpenTelemetry)
 import './config/tracing';
-// Inicia tracing antes de qualquer outra importação para instrumentação correta
-import './config/tracing';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
