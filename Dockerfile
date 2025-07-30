@@ -17,7 +17,7 @@ COPY . .
 
 # Gerar cliente Prisma
 ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
-RUN pnpm prisma generate
+RUN npx prisma generate
 
 # Build da aplicação
 RUN pnpm run build
