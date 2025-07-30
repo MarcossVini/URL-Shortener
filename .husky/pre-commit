@@ -2,7 +2,7 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # Verifica lint e formatação nos arquivos staged
-pnpm lint-staged
+pnpm exec lint-staged
 
 # Executa testes para garantir integridade
 pnpm test

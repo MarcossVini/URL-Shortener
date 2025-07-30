@@ -26,7 +26,9 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install pnpm globally
-        run: npm install -g pnpm
+        run: |
+          npm install -g pnpm
+          echo "$(npm bin -g)" >> $GITHUB_PATH
 
       - name: Debug pnpm installation
         run: |
