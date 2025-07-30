@@ -13,6 +13,17 @@ import { userRoutes } from './features/shorten/routes/user.routes';
 
 const app = express();
 
+// Catch uncaught exceptions and unhandled rejections in serverless environment
+if (process.env.VERCEL) {
+  process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception in serverless:', error);
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+}
+
 // Middlewares de segurança
 app.use(helmet());
 app.use(cors());
@@ -80,6 +91,23 @@ app.use('/user', userRoutes);
  */
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Global error handler for unhandled exceptions
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(
+  (error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('❌ Unhandled error in serverless function:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
+    });
+  },
+);
+
+// Handle 404s
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
 });
 
 // Expose Express app for serverless platforms (e.g., Vercel)
