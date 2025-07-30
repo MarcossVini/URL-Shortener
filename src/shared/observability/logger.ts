@@ -47,20 +47,22 @@ export const logger = winston.createLogger({
           : logFormat,
     }),
 
-    // File transport para logs de erro
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-
-    // File transport para todos os logs
-    new winston.transports.File({
-      filename: 'logs/combined.log',
-      maxsize: 5242880, // 5MB
-      maxFiles: 10,
-    }),
+    // File transports apenas para desenvolvimento local
+    ...(env.NODE_ENV === 'development' && !process.env.VERCEL
+      ? [
+          new winston.transports.File({
+            filename: 'logs/error.log',
+            level: 'error',
+            maxsize: 5242880, // 5MB
+            maxFiles: 5,
+          }),
+          new winston.transports.File({
+            filename: 'logs/combined.log',
+            maxsize: 5242880, // 5MB
+            maxFiles: 10,
+          }),
+        ]
+      : []),
   ],
 });
 
