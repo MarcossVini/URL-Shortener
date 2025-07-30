@@ -1,20 +1,15 @@
 {
   "version": 2,
   "buildCommand": "pnpm vercel-build",
-  "builds": [
-    {
-      "src": "dist/src/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb",
-        "maxDuration": 30
-      }
+  "functions": {
+    "dist/src/server.js": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "dist/src/server.js"
+      "source": "/(.*)",
+      "destination": "/dist/src/server.js"
     }
   ],
   "env": {
