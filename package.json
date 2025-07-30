@@ -22,7 +22,8 @@
     "database:test": "docker compose -f docker-compose-test.yml up --build",
     "prepare": "husky install",
     "commit": "git add . && git cz",
-    "release": "standard-version"
+    "release": "standard-version",
+    "vercel-build": "pnpm build"
   },
   "keywords": [],
   "author": "",
