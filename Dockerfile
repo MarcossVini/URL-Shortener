@@ -16,6 +16,7 @@ RUN pnpm install --no-frozen-lockfile
 COPY . .
 
 # Gerar cliente Prisma
+ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
 RUN pnpm prisma generate
 
 # Build da aplicação
