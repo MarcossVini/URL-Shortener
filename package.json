@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cross-env OTEL_SERVICE_NAME=shortener-api OTEL_EXPORTER_JAEGER_ENDPOINT=http://localhost:14268/api/traces ts-node-dev src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "seed": "ts-node prisma/seed.ts",
     "prisma": "npx prisma migrate deploy",
     "prisma:dev": "npx prisma migrate dev",
@@ -51,7 +51,7 @@
     "cls-hooked": "^4.2.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
+    "express": "^4.19.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "prisma": "^6.12.0",

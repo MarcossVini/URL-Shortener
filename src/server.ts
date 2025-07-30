@@ -74,6 +74,58 @@ app.use('/auth', authRoutes);
 app.use('/shorten', shortenRoutes);
 app.use('/user', userRoutes);
 
+// Rota de redirecionamento deve vir após as rotas específicas
+/**
+ * @swagger
+ * /{shortCode}:
+ *   get:
+ *     summary: Redirecionar URL
+ *     description: Redireciona para a URL original baseada no código encurtado
+ *     tags: [URL Shortening]
+ *     parameters:
+ *       - in: path
+ *         name: shortCode
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Código da URL encurtada
+ *         example: abc123
+ *     responses:
+ *       200:
+ *         description: URL encontrada (localização em JSON)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 location:
+ *                   type: string
+ *                   example: https://www.google.com
+ *       302:
+ *         description: Redirecionamento para URL original
+ *       404:
+ *         description: URL não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+app.get('/:shortCode', (req, res, next) => {
+  const { shortCode } = req.params;
+
+  // Evitar conflitos com rotas específicas já definidas
+  if (
+    ['auth', 'shorten', 'user', 'health', 'metrics', 'api-docs', 'favicon.ico'].includes(shortCode)
+  ) {
+    return next();
+  }
+
+  // Importar e usar o RedirectController
+  const { RedirectController } = require('./features/shorten/useCases/redirect/RedirectController');
+  const redirectController = new RedirectController();
+  return redirectController.handle(req, res);
+});
+
 /**
  * @swagger
  * /health:
@@ -94,16 +146,19 @@ app.get('/health', (req, res) => {
 });
 
 // Global error handler for unhandled exceptions
-app.use((error: Error, req: express.Request, res: express.Response) => {
-  console.error('❌ Unhandled error in serverless function:', error);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
-  });
-});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(
+  (error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('❌ Unhandled error in serverless function:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
+    });
+  },
+);
 
 // Handle 404s
-app.use('*', (req, res) => {
+app.all('*', (req, res) => {
   res.status(404).json({ error: 'Not Found', path: req.originalUrl });
 });
 
