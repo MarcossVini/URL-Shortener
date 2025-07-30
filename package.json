@@ -23,7 +23,7 @@
     "prepare": "husky install",
     "commit": "git add . && git cz",
     "release": "standard-version",
-    "vercel-build": "pnpm build"
+    "vercel-build": "npx prisma generate && pnpm build"
   },
   "engines": {
     "node": ">=18.0.0",
