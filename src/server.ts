@@ -94,16 +94,13 @@ app.get('/health', (req, res) => {
 });
 
 // Global error handler for unhandled exceptions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use(
-  (error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error('❌ Unhandled error in serverless function:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
-    });
-  },
-);
+app.use((error: Error, req: express.Request, res: express.Response) => {
+  console.error('❌ Unhandled error in serverless function:', error);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
+  });
+});
 
 // Handle 404s
 app.use('*', (req, res) => {

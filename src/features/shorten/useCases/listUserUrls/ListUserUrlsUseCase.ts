@@ -1,5 +1,14 @@
 import { prisma } from '../../../../database/prisma';
 
+type UrlWithAccessLogs = {
+  id: string;
+  original_url: string;
+  short_code: string;
+  created_at: Date;
+  updated_at: Date;
+  accessLogs: { id: string }[];
+};
+
 export class ListUserUrlsUseCase {
   async execute(userId: string) {
     const urls = await prisma.shortenedUrl.findMany({
@@ -19,7 +28,7 @@ export class ListUserUrlsUseCase {
       },
     });
 
-    return urls.map((url: any) => ({
+    return urls.map((url: UrlWithAccessLogs) => ({
       id: url.id,
       original_url: url.original_url,
       short_code: url.short_code,
