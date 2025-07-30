@@ -25,10 +25,14 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
+      - name: Install pnpm globally
+        run: npm install -g pnpm
+
+      - name: Debug pnpm installation
+        run: |
+          echo "PATH: $PATH"
+          which pnpm || echo "pnpm not found"
+          pnpm --version || echo "pnpm version check failed"
 
       - name: Install dependencies
         run: pnpm install
