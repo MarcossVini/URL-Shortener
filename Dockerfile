@@ -9,9 +9,8 @@ RUN apk add --no-cache libc6-compat && \
 # Copiar arquivos de configuração
 COPY package.json pnpm-lock.yaml ./
 
-# Limpar cache do npm/pnpm antes da instalação
-RUN pnpm store prune && \
-    pnpm install --frozen-lockfile --no-optional
+# Instalar dependências
+RUN pnpm install --frozen-lockfile
 
 # Copiar prisma
 COPY prisma ./prisma/
