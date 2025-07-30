@@ -44,6 +44,23 @@ app.use(
  *         description: Métricas no formato JSON
  */
 app.get('/metrics', getMetricsEndpoint);
+
+// Rota raiz - redireciona para documentação
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Página inicial da API
+ *     description: Redireciona para a documentação da API
+ *     tags: [System]
+ *     responses:
+ *       302:
+ *         description: Redirecionamento para documentação
+ */
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
+
 app.use('/auth', authRoutes);
 app.use('/shorten', shortenRoutes);
 app.use('/user', userRoutes);
