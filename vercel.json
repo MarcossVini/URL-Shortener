@@ -1,15 +1,11 @@
 {
   "version": 2,
   "buildCommand": "pnpm vercel-build",
-  "functions": {
-    "dist/src/server.js": {
-      "maxDuration": 30
-    }
-  },
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/dist/src/server.js"
+      "destination": "/src/server.js"
     }
   ],
   "env": {
