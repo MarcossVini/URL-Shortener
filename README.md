@@ -2,6 +2,8 @@
 
 API completa para encurtamento de URLs com autenticação JWT e gerenciamento de usuários.
 
+> ✅ **Status**: Deployment v1.0.20+ com correções aplicadas
+
 ## 📋 Índice
 
 - [Funcionalidades](#-funcionalidades)
