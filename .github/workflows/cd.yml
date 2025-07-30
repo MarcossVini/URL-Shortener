@@ -45,6 +45,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase username
+        id: set-username
+        run: echo "username=${GITHUB_ACTOR,,}" >> $GITHUB_OUTPUT
+
       - name: Build & push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -52,8 +56,8 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.actor }}/url-shortener:${{ github.ref_name }}
-            ghcr.io/${{ github.actor }}/url-shortener:latest
+            ghcr.io/${{ steps.set-username.outputs.username }}/url-shortener:${{ github.ref_name }}
+            ghcr.io/${{ steps.set-username.outputs.username }}/url-shortener:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
