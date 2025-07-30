@@ -1,0 +1,69 @@
+# Multi-stage build para otimizar tamanho da imagem
+FROM node:18-alpine AS base
+
+# Instalar dependências do sistema
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm@8
+
+# ===== DEPENDENCIES =====
+FROM base AS deps
+
+# Copiar arquivos de dependências
+COPY package.json pnpm-lock.yaml ./
+
+# Instalar todas as dependências
+RUN pnpm install --frozen-lockfile
+
+# ===== BUILDER =====
+FROM base AS builder
+
+WORKDIR /app
+
+# Copiar dependências do stage anterior
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copiar código fonte
+COPY . .
+
+# Gerar cliente Prisma
+ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
+RUN npx prisma generate
+
+# Build da aplicação
+RUN pnpm run build
+
+# ===== RUNNER =====
+FROM node:18-alpine AS runner
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Instalar pnpm
+RUN npm install -g pnpm@8
+
+# Copiar package.json para pnpm prune
+COPY package.json pnpm-lock.yaml ./
+
+# Instalar apenas dependências de produção
+RUN pnpm install --frozen-lockfile --prod
+
+# Copiar aplicação buildada
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.pnpm/@prisma ./node_modules/.pnpm/@prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Gerar cliente Prisma novamente no ambiente de produção
+ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
+RUN npx prisma generate
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
+
+CMD ["node", "dist/src/server.js"]

@@ -2,26 +2,30 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copiar arquivos de dependências
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+# Instalar dependências do sistema e pnpm
+RUN apk add --no-cache libc6-compat && \
+    npm install -g pnpm@8
 
-# Instalar pnpm globalmente
-RUN npm install -g pnpm
+# Copiar arquivos de configuração
+COPY package.json pnpm-lock.yaml ./
 
-# Instalar todas as dependências (incluindo devDependencies)
-RUN pnpm install --no-frozen-lockfile
+# Limpar cache do npm/pnpm antes da instalação
+RUN pnpm store prune && \
+    pnpm install --frozen-lockfile --no-optional
+
+# Copiar prisma
+COPY prisma ./prisma/
+
+# Gerar cliente Prisma
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+RUN npx prisma generate
 
 # Copiar código fonte
 COPY . .
 
-# Gerar cliente Prisma
-ENV DATABASE_URL="postgresql://user:pass@localhost:5432/dummy"
-RUN npx prisma generate
-
-# Build da aplicação
+# Build
 RUN pnpm run build
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"] 
+CMD ["node", "dist/src/server.js"] 

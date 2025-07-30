@@ -1,0 +1,66 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Environment files
+.env
+.env.local
+.env.example
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git
+.gitignore
+README.md
+
+# Test files
+coverage
+src/**/*.test.ts
+src/**/*.spec.ts
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Vercel
+.vercel
+.vercelignore
+
+# Development tools
+.husky
+vitest.config.ts
+commitlint.config.js
+
+# Documentation
+docs/
+CONTRIBUTING.md
+PROJECT_CHECKLIST.md
+
+# Scripts
+setup.sh
+setup.ps1
+git-workflow-example.sh
+wait-for-deployment.js
