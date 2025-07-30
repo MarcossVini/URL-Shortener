@@ -7,37 +7,31 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
+    name: 'Test & Lint'
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: ['18']
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install pnpm globally
-        run: |
-          npm install -g pnpm
-          echo "$(npm bin -g)" >> $GITHUB_PATH
-
-      - name: Debug pnpm installation
-        run: |
-          echo "PATH: $PATH"
-          which pnpm || echo "pnpm not found"
-          pnpm --version || echo "pnpm version check failed"
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint code
         run: pnpm lint
