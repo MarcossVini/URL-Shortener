@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "name": "url-shortener",
   "buildCommand": "npm run build",
   "builds": [
     {
       "src": "dist/src/server.js",
       "use": "@vercel/node",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "50mb",
+        "maxDuration": 30
       }
     }
   ],
@@ -19,10 +19,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "dist/src/server.js": {
-      "maxDuration": 30
-    }
   }
 }
