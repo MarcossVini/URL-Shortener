@@ -24,9 +24,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install pnpm globally
-        run: npm install -g pnpm
+          package-manager: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
