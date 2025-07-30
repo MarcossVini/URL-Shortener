@@ -1,13 +1,18 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
 
-// Carregar variáveis de ambiente do arquivo .env
-const result = dotenv.config();
+// Carregar variáveis de ambiente do arquivo .env apenas em desenvolvimento
+// Em produção (Vercel), as variáveis são injetadas automaticamente
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const result = dotenv.config();
 
-if (result.error) {
-  console.error('❌ Erro ao carregar arquivo .env:', result.error.message);
-  console.log('📝 Certifique-se de que o arquivo .env existe na raiz do projeto');
-  process.exit(1);
+  if (result.error) {
+    console.error('❌ Erro ao carregar arquivo .env:', result.error.message);
+    console.log('📝 Certifique-se de que o arquivo .env existe na raiz do projeto');
+    process.exit(1);
+  }
+} else {
+  console.log('🔧 Usando variáveis de ambiente do sistema (produção)');
 }
 
 const envSchema = z.object({
@@ -51,7 +56,12 @@ LOG_LEVEL=info
 
     // Em ambiente serverless, não podemos usar process.exit()
     if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-      throw new Error('Environment validation failed - check your environment variables');
+      // Criar erro mais informativo para debugging no Vercel
+      const errorMessage =
+        error instanceof z.ZodError
+          ? `Environment validation failed: ${error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+          : 'Environment validation failed - check your environment variables';
+      throw new Error(errorMessage);
     }
 
     process.exit(1);
