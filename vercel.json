@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm vercel-build",
+  "buildCommand": "npx prisma generate && npx tsc",
   "rewrites": [
     {
       "source": "/(.*)",

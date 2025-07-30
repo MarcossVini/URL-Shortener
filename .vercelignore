@@ -1,0 +1,35 @@
+# Development files
+src/
+.env
+.env.example
+.git/
+.github/
+.gitignore
+.eslintrc.json
+.lintstagedrc.json
+.prettierrc
+.prettierrc.json
+.husky/
+vitest.config.ts
+wait-for-deployment.js
+setup.sh
+setup.ps1
+git-workflow-example.sh
+docker-compose.yml
+Dockerfile
+CONTRIBUTING.md
+PROJECT_CHECKLIST.md
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+
+# Logs
+logs/
+*.log
+
+# Documentation
+docs/
+README.md
