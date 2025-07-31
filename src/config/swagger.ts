@@ -32,7 +32,7 @@ Authorization: Bearer <seu-jwt-token>
 
 1. **Login**: \`POST /auth/login\`
 2. **Encurtar URL**: \`POST /shorten\`
-3. **Redirecionar**: \`GET /shorten/{shortCode}\`
+3. **Redirecionar**: \`GET /{shortCode}\`
 4. **Listar URLs**: \`GET /user/urls\`
 
 ### 🛠️ Tecnologias
@@ -56,10 +56,295 @@ Authorization: Bearer <seu-jwt-token>
     },
     servers: [
       {
-        url: `http://localhost:${env.PORT}`,
-        description: 'Development server',
+        url: process.env.VERCEL
+          ? 'https://url-shortener-hazel-rho.vercel.app'
+          : `http://localhost:${env.PORT}`,
+        description: process.env.VERCEL ? 'Production server' : 'Development server',
       },
     ],
+    paths: {
+      '/health': {
+        get: {
+          summary: 'Health Check',
+          description: 'Verifica o status da aplicação',
+          tags: ['System'],
+          responses: {
+            '200': {
+              description: 'Aplicação funcionando normalmente',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/HealthResponse',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/metrics': {
+        get: {
+          summary: 'Expor métricas da aplicação',
+          tags: ['Observability'],
+          responses: {
+            '200': {
+              description: 'Métricas no formato JSON',
+            },
+          },
+        },
+      },
+      '/': {
+        get: {
+          summary: 'Página inicial da API',
+          description: 'Redireciona para a documentação da API',
+          tags: ['System'],
+          responses: {
+            '302': {
+              description: 'Redirecionamento para documentação',
+            },
+          },
+        },
+      },
+      '/auth/login': {
+        post: {
+          summary: 'Autenticar usuário',
+          description: 'Realiza login do usuário e retorna JWT token',
+          tags: ['Authentication'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/LoginRequest',
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Login realizado com sucesso',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/LoginResponse',
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Dados inválidos',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+            '500': {
+              description: 'Erro interno do servidor',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/shorten': {
+        post: {
+          summary: 'Encurtar URL',
+          description: 'Cria uma URL encurtada. Autenticação é opcional.',
+          tags: ['URL Shortening'],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/CreateShortUrlRequest',
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'URL encurtada criada com sucesso',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/CreateShortUrlResponse',
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Dados inválidos',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+            '500': {
+              description: 'Erro interno do servidor',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/user/urls': {
+        get: {
+          summary: 'Listar URLs do usuário',
+          description: 'Lista todas as URLs encurtadas do usuário autenticado',
+          tags: ['User URLs'],
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '200': {
+              description: 'Lista de URLs do usuário',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/UserUrlsResponse',
+                  },
+                },
+              },
+            },
+            '401': {
+              description: 'Usuário não autenticado',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/user/urls/{id}': {
+        patch: {
+          summary: 'Atualizar URL do usuário',
+          description: 'Atualiza a URL original de uma URL encurtada do usuário',
+          tags: ['User URLs'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: {
+                type: 'string',
+              },
+              description: 'ID da URL encurtada',
+            },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/CreateShortUrlRequest',
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'URL atualizada com sucesso',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/CreateShortUrlResponse',
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Dados inválidos ou URL não encontrada',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+            '401': {
+              description: 'Usuário não autenticado',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+        delete: {
+          summary: 'Deletar URL do usuário',
+          description: 'Deleta uma URL encurtada do usuário (soft delete)',
+          tags: ['User URLs'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: {
+                type: 'string',
+              },
+              description: 'ID da URL encurtada',
+            },
+          ],
+          responses: {
+            '200': {
+              description: 'URL deletada com sucesso',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/DeleteUrlResponse',
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'URL não encontrada',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+            '401': {
+              description: 'Usuário não autenticado',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -244,7 +529,7 @@ Authorization: Bearer <seu-jwt-token>
       },
     },
   },
-  apis: ['./src/features/**/routes/*.ts', './src/server.ts'],
+  apis: [], // Não precisamos mais de APIs externas já que definimos tudo inline
 };
 
 export const specs = swaggerJsdoc(options);
