@@ -10,11 +10,8 @@ import { authRoutes } from './features/auth/routes/auth.routes';
 import { shortenRoutes } from './features/shorten/routes/shorten.routes';
 import { userRoutes } from './features/shorten/routes/user.routes';
 
-// Import Swagger UI only in non-production environments
-let swaggerUi: any = null;
-if (process.env.NODE_ENV !== 'production') {
-  swaggerUi = require('swagger-ui-express');
-}
+// Import Swagger UI - always available
+import swaggerUi from 'swagger-ui-express';
 
 const app = express();
 
@@ -37,33 +34,15 @@ app.use(express.json());
 app.use(metricsMiddleware);
 
 // Swagger Documentation - Only in development
-if (process.env.NODE_ENV !== 'production') {
-  app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(specs, {
-      customCss: '.swagger-ui .topbar { display: none }',
-      customSiteTitle: 'Shortener API Documentation',
-    }),
-  );
-} else {
-  // Simple documentation endpoint for production
-  app.get('/api-docs', (req, res) => {
-    res.json({
-      name: 'Shortener API',
-      version: '1.0.0',
-      description: 'URL Shortener API - Documentation available in development mode',
-      endpoints: {
-        health: '/health',
-        metrics: '/metrics',
-        auth: '/auth/*',
-        shorten: '/shorten/*',
-        user: '/user/*',
-      },
-      swagger: specs,
-    });
-  });
-}
+// Swagger Documentation - Available in all environments
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Shortener API Documentation',
+  }),
+);
 
 // Rotas
 /**
