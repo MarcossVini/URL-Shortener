@@ -46,7 +46,11 @@ app.use(
         ],
         fontSrc: ["'self'", 'https:', 'data:'],
         imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'"],
+        connectSrc: [
+          "'self'",
+          'https://url-shortener-hazel-rho.vercel.app',
+          'https://*.vercel.app',
+        ],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'self'"],
