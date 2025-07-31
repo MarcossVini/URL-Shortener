@@ -33,16 +33,93 @@ app.use(express.json());
 // Middleware de métricas
 app.use(metricsMiddleware);
 
-// Swagger Documentation - Only in development
 // Swagger Documentation - Available in all environments
-app.use(
-  '/api-docs',
-  swaggerUi.serve,
-  swaggerUi.setup(specs, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Shortener API Documentation',
-  }),
-);
+// Serve static files first for Swagger UI assets
+if (process.env.VERCEL) {
+  // In serverless environment, create custom swagger UI HTML
+  app.get('/api-docs', (req, res) => {
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Shortener API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css" />
+    <style>
+      html {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+      body {
+        margin:0;
+        background: #fafafa;
+      }
+      .swagger-ui .topbar { display: none; }
+      .swagger-ui .info { margin: 50px 0; }
+      .swagger-ui .info .title { color: #3b82f6; font-size: 36px; }
+    </style>
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+      window.onload = function() {
+        const ui = SwaggerUIBundle({
+          url: window.location.origin + '/api-docs/swagger.json',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          plugins: [
+            SwaggerUIBundle.plugins.DownloadUrl
+          ],
+          layout: "StandaloneLayout",
+          persistAuthorization: true,
+          displayRequestDuration: true,
+          filter: true,
+          showExtensions: true,
+          showCommonExtensions: true
+        });
+      };
+    </script>
+  </body>
+</html>`;
+    res.set('Content-Type', 'text/html').send(html);
+  });
+
+  // Serve the OpenAPI spec as JSON
+  app.get('/api-docs/swagger.json', (req, res) => {
+    res.set('Content-Type', 'application/json').send(specs);
+  });
+} else {
+  // In development, use the standard swagger-ui-express
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, {
+      customCss: `
+        .swagger-ui .topbar { display: none }
+        .swagger-ui .info { margin: 50px 0; }
+        .swagger-ui .info .title { color: #3b82f6; font-size: 36px; }
+      `,
+      customSiteTitle: 'Shortener API Documentation',
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+      },
+    }),
+  );
+}
 
 // Rotas
 /**
