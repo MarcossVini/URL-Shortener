@@ -4,12 +4,17 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { metricsMiddleware, getMetricsEndpoint } from './shared/observability/metrics';
-import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env';
 import { specs } from './config/swagger';
 import { authRoutes } from './features/auth/routes/auth.routes';
 import { shortenRoutes } from './features/shorten/routes/shorten.routes';
 import { userRoutes } from './features/shorten/routes/user.routes';
+
+// Import Swagger UI only in non-production environments
+let swaggerUi: any = null;
+if (process.env.NODE_ENV !== 'production') {
+  swaggerUi = require('swagger-ui-express');
+}
 
 const app = express();
 
@@ -31,15 +36,34 @@ app.use(express.json());
 // Middleware de métricas
 app.use(metricsMiddleware);
 
-// Swagger Documentation
-app.use(
-  '/api-docs',
-  swaggerUi.serve,
-  swaggerUi.setup(specs, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Shortener API Documentation',
-  }),
-);
+// Swagger Documentation - Only in development
+if (process.env.NODE_ENV !== 'production') {
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, {
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'Shortener API Documentation',
+    }),
+  );
+} else {
+  // Simple documentation endpoint for production
+  app.get('/api-docs', (req, res) => {
+    res.json({
+      name: 'Shortener API',
+      version: '1.0.0',
+      description: 'URL Shortener API - Documentation available in development mode',
+      endpoints: {
+        health: '/health',
+        metrics: '/metrics',
+        auth: '/auth/*',
+        shorten: '/shorten/*',
+        user: '/user/*',
+      },
+      swagger: specs,
+    });
+  });
+}
 
 // Rotas
 /**
