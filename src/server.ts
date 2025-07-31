@@ -38,8 +38,20 @@ app.use(
   swaggerUi.setup(specs, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'Shortener API Documentation',
+    swaggerOptions: {
+      url: '/api-docs/swagger.json',
+    },
   }),
 );
+
+// Servir arquivos estáticos do Swagger UI
+app.use('/api-docs', express.static(require('swagger-ui-dist').absolutePath()));
+
+// Servir o JSON do Swagger
+app.get('/api-docs/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(specs);
+});
 
 // Rotas
 /**
