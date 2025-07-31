@@ -8,8 +8,12 @@
   ],
   "routes": [
     {
+      "src": "/api-docs/(.*)",
+      "dest": "/api/api-docs/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/api"
+      "dest": "/api/$1"
     }
   ],
   "env": {
