@@ -38,12 +38,8 @@ app.use(
           'https://unpkg.com',
           'https://cdnjs.cloudflare.com',
         ],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          'https://unpkg.com',
-          'https://cdnjs.cloudflare.com',
-        ],
+        scriptSrc: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
+        scriptSrcElem: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
         fontSrc: ["'self'", 'https:', 'data:'],
         imgSrc: ["'self'", 'data:', 'https:'],
         connectSrc: [
@@ -60,6 +56,8 @@ app.use(
 );
 app.use(cors());
 app.use(express.json());
+// Servir arquivos estáticos da pasta public
+app.use(express.static('public'));
 // Middleware de métricas
 app.use(metricsMiddleware);
 
@@ -97,28 +95,7 @@ if (process.env.VERCEL) {
     <div id="swagger-ui"></div>
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
-    <script>
-      window.onload = function() {
-        const ui = SwaggerUIBundle({
-          url: window.location.origin + '/api-docs/swagger.json',
-          dom_id: '#swagger-ui',
-          deepLinking: true,
-          presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset
-          ],
-          plugins: [
-            SwaggerUIBundle.plugins.DownloadUrl
-          ],
-          layout: "StandaloneLayout",
-          persistAuthorization: true,
-          displayRequestDuration: true,
-          filter: true,
-          showExtensions: true,
-          showCommonExtensions: true
-        });
-      };
-    </script>
+    <script src="/swagger-init.js"></script>
   </body>
 </html>`;
     res.set('Content-Type', 'text/html').send(html);
