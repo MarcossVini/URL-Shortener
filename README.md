@@ -4,7 +4,7 @@ API completa para encurtamento de URLs com autenticação JWT, gerenciamento de 
 
 > ✅ **Status**: Deployment v1.2.0+ - Funcionando em produção no Vercel
 >
-> 🌐 **Live Demo**: [https://url-shortener-hazel-rho.vercel.app](https://url-shortener-hazel-rho.vercel.app)
+> 🌐 **Live Demo**: [https://url-shortener-hazel-rho.vercel.app](https://url-shortener-argbox2il-marcos-projects-3cc17e4e.vercel.app/api-docs)
 
 ## 📋 Índice
 
