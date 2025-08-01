@@ -38,8 +38,18 @@ app.use(
           'https://unpkg.com',
           'https://cdnjs.cloudflare.com',
         ],
-        scriptSrc: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
-        scriptSrcElem: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com'],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // Needed for Swagger UI inline scripts
+          'https://unpkg.com',
+          'https://cdnjs.cloudflare.com',
+        ],
+        scriptSrcElem: [
+          "'self'",
+          "'unsafe-inline'", // Needed for Swagger UI inline scripts
+          'https://unpkg.com',
+          'https://cdnjs.cloudflare.com',
+        ],
         fontSrc: ["'self'", 'https:', 'data:'],
         imgSrc: ["'self'", 'data:', 'https:'],
         connectSrc: [
