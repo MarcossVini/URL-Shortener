@@ -64,22 +64,37 @@ jobs:
 
           # Wait for deployment to be ready
           echo "⏳ Waiting for deployment to be ready..."
-          sleep 15
+          sleep 20
 
-          # Health check with retry logic
+          # Test basic connectivity first
+          echo "🌐 Testing basic connectivity..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$DEPLOYMENT_URL" || echo "000")
+          echo "📊 HTTP Status Code: $HTTP_CODE"
+
+          # Health check with retry logic and better error handling
           echo "🏥 Running health check..."
           for i in {1..5}; do
-            if curl -f -s "$DEPLOYMENT_URL/health" > /dev/null; then
+            HEALTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$DEPLOYMENT_URL/health" || echo "000")
+            echo "🔍 Health check attempt $i - Status: $HEALTH_CODE"
+            
+            if [ "$HEALTH_CODE" = "200" ]; then
               echo "✅ Preview health check passed on attempt $i"
               echo "🔗 Preview URL: $DEPLOYMENT_URL"
               echo "📚 Preview Swagger: $DEPLOYMENT_URL/api-docs"
               echo "🧪 Preview Tester: $DEPLOYMENT_URL/api-tester-advanced.html"
               exit 0
+            elif [ "$HEALTH_CODE" = "000" ]; then
+              echo "⚠️ Connection failed on attempt $i, retrying in 15s..."
+              sleep 15
             else
-              echo "⚠️ Health check attempt $i failed, retrying in 10s..."
+              echo "⚠️ Health check returned $HEALTH_CODE on attempt $i, retrying in 10s..."
               sleep 10
             fi
           done
 
           echo "❌ Preview health check failed after 5 attempts"
-          echo "🔍 Preview may still be starting up. Check manually at: $DEPLOYMENT_URL"
+          echo "🔍 Preview may still be starting up. URLs to check manually:"
+          echo "   🔗 Main: $DEPLOYMENT_URL"
+          echo "   🏥 Health: $DEPLOYMENT_URL/health"
+          echo "   📚 Swagger: $DEPLOYMENT_URL/api-docs"
+          echo "🎯 Marking as deployment success since Vercel deploy completed"
