@@ -65,6 +65,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Deploy to Vercel
+        id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -73,25 +74,37 @@ jobs:
           echo "🚀 Deploying to Vercel..."
           npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
           npx vercel build --prod --token $VERCEL_TOKEN
-          npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
+          DEPLOYMENT_URL=$(npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN)
+          echo "deployment-url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployment completed: $DEPLOYMENT_URL"
 
       - name: Verify Deployment
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
         run: |
           echo "🔍 Verifying deployment..."
-          DEPLOYMENT_URL=$(npx vercel ls --token $VERCEL_TOKEN | head -2 | tail -1 | awk '{print $2}')
-          echo "Deployment URL: https://$DEPLOYMENT_URL"
+          echo "Deployment URL: $DEPLOYMENT_URL"
 
           # Wait for deployment to be ready
-          sleep 10
+          echo "⏳ Waiting for deployment to be ready..."
+          sleep 15
 
-          # Health check
-          if curl -f -s "https://$DEPLOYMENT_URL/health" > /dev/null; then
-            echo "✅ Health check passed"
-            echo "📚 Swagger UI: https://$DEPLOYMENT_URL/api-docs"
-            echo "📊 Metrics: https://$DEPLOYMENT_URL/metrics"
-          else
-            echo "❌ Health check failed"
-            exit 1
-          fi
+          # Health check with retry logic
+          echo "🏥 Running health check..."
+          for i in {1..5}; do
+            if curl -f -s "$DEPLOYMENT_URL/health" > /dev/null; then
+              echo "✅ Health check passed on attempt $i"
+              echo "🌐 Production URL: $DEPLOYMENT_URL"
+              echo "📚 Swagger UI: $DEPLOYMENT_URL/api-docs"
+              echo "🧪 API Tester: $DEPLOYMENT_URL/api-tester-advanced.html"
+              echo "📊 Metrics: $DEPLOYMENT_URL/metrics"
+              exit 0
+            else
+              echo "⚠️ Health check attempt $i failed, retrying in 10s..."
+              sleep 10
+            fi
+          done
+
+          echo "❌ Health check failed after 5 attempts"
+          echo "🔍 Deployment may still be starting up. Check manually at: $DEPLOYMENT_URL"
+          exit 1

@@ -42,6 +42,7 @@ jobs:
         run: pnpm build
 
       - name: Deploy to Vercel Preview
+        id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -51,63 +52,34 @@ jobs:
           npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
           npx vercel build --token $VERCEL_TOKEN
           DEPLOYMENT_URL=$(npx vercel deploy --prebuilt --token $VERCEL_TOKEN)
-          echo "Preview URL: $DEPLOYMENT_URL"
+          echo "deployment-url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "✅ Preview deployment completed: $DEPLOYMENT_URL"
 
       - name: Verify Preview Deployment
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
         run: |
           echo "🔍 Verifying preview deployment..."
-          DEPLOYMENT_URL=$(npx vercel ls --token $VERCEL_TOKEN | head -2 | tail -1 | awk '{print $2}')
+          echo "Preview URL: $DEPLOYMENT_URL"
 
           # Wait for deployment to be ready
-          sleep 10
+          echo "⏳ Waiting for deployment to be ready..."
+          sleep 15
 
-          # Health check
-          if curl -f -s "https://$DEPLOYMENT_URL/health" > /dev/null; then
-            echo "✅ Preview health check passed"
-            echo "🔗 Preview URL: https://$DEPLOYMENT_URL"
-            echo "📚 Preview Swagger: https://$DEPLOYMENT_URL/api-docs"
-            echo "🧪 Preview Tester: https://$DEPLOYMENT_URL/api-tester-advanced.html"
-          else
-            echo "⚠️ Preview health check failed - deployment may still be starting"
-          fi
+          # Health check with retry logic
+          echo "🏥 Running health check..."
+          for i in {1..5}; do
+            if curl -f -s "$DEPLOYMENT_URL/health" > /dev/null; then
+              echo "✅ Preview health check passed on attempt $i"
+              echo "🔗 Preview URL: $DEPLOYMENT_URL"
+              echo "📚 Preview Swagger: $DEPLOYMENT_URL/api-docs"
+              echo "🧪 Preview Tester: $DEPLOYMENT_URL/api-tester-advanced.html"
+              exit 0
+            else
+              echo "⚠️ Health check attempt $i failed, retrying in 10s..."
+              sleep 10
+            fi
+          done
 
-      - name: Comment PR with Preview URL
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        with:
-          script: |
-            const { execSync } = require('child_process');
-            try {
-              const output = execSync('npx vercel ls --token ${{ secrets.VERCEL_TOKEN }}', { encoding: 'utf8' });
-              const lines = output.split('\n');
-              const deploymentUrl = lines[1] ? lines[1].split(/\s+/)[1] : null;
-              
-              if (deploymentUrl) {
-                const body = `
-            ## 🚀 Preview Deployment Ready!
-
-            Your changes have been deployed to a preview environment:
-
-            - **🔗 Preview URL**: https://${deploymentUrl}
-            - **📚 API Documentation**: https://${deploymentUrl}/api-docs
-            - **🧪 Interactive Tester**: https://${deploymentUrl}/api-tester-advanced.html
-            - **🏥 Health Check**: https://${deploymentUrl}/health
-            - **📊 Metrics**: https://${deploymentUrl}/metrics
-
-            The preview will be updated automatically with new commits to this PR.
-                `;
-                
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: body
-                });
-              }
-            } catch (error) {
-              console.log('Could not get deployment URL:', error.message);
-            }
+          echo "❌ Preview health check failed after 5 attempts"
+          echo "🔍 Preview may still be starting up. Check manually at: $DEPLOYMENT_URL"
