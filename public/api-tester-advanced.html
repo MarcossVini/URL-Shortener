@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Shortener API - Interactive Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .api-tester {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+        
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .response {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .status-success {
+            border-left: 4px solid #10b981;
+        }
+        
+        .status-error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-action {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action:hover {
+            background: #667eea;
+            color: white;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .auth-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .auth-status.authenticated {
+            background: #10b981;
+            color: white;
+        }
+        
+        .auth-status.unauthenticated {
+            background: #ef4444;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .api-tester {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Shortener API Tester</h1>
+            <p>Interactive testing interface for all API endpoints</p>
+        </div>
+        
+        <div class="api-tester">
+            <!-- Authentication Section -->
+            <div class="section">
+                <h3>🔐 Authentication 
+                    <span id="authStatus" class="auth-status unauthenticated">Not Authenticated</span>
+                </h3>
+                
+                <div class="quick-actions">
+                    <button class="quick-action" onclick="setDemoCredentials()">Use Demo Credentials</button>
+                    <button class="quick-action" onclick="clearAuth()">Clear Auth</button>
+                    <button class="quick-action" onclick="showStoredToken()">Show Token</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="user@example.com" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" placeholder="your-password" />
+                </div>
+                
+                <button onclick="login()">🔑 Login</button>
+                <button onclick="testProtectedEndpoint()">🛡️ Test Protected Endpoint</button>
+                
+                <div id="authResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- URL Shortening Section -->
+            <div class="section">
+                <h3>✂️ URL Shortening</h3>
+                
+                <div class="quick-actions">
+                    <button class="quick-action" onclick="setDemoUrl()">Use Demo URL</button>
+                    <button class="quick-action" onclick="generateRandomUrl()">Random URL</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="originalUrl">Original URL:</label>
+                    <input type="url" id="originalUrl" placeholder="https://example.com" />
+                </div>
+                
+                <button onclick="shortenUrl()">✂️ Shorten URL</button>
+                <button onclick="shortenUrlAuthenticated()">✂️ Shorten URL (Authenticated)</button>
+                
+                <div id="shortenResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- URL Management Section -->
+            <div class="section">
+                <h3>📊 URL Management</h3>
+                
+                <div class="form-group">
+                    <label for="shortCode">Short Code:</label>
+                    <input type="text" id="shortCode" placeholder="abc123" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="newUrl">New URL (for update):</label>
+                    <input type="url" id="newUrl" placeholder="https://new-url.com" />
+                </div>
+                
+                <button onclick="getUserUrls()">📋 Get My URLs</button>
+                <button onclick="redirectTest()">🔄 Test Redirect</button>
+                <button onclick="updateUrl()">✏️ Update URL</button>
+                <button onclick="deleteUrl()">🗑️ Delete URL</button>
+                
+                <div id="managementResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- System Endpoints Section -->
+            <div class="section">
+                <h3>🏥 System & Monitoring</h3>
+                
+                <button onclick="healthCheck()">🏥 Health Check</button>
+                <button onclick="getMetrics()">📊 Get Metrics</button>
+                <button onclick="openSwaggerDocs()">📚 Open API Docs</button>
+                
+                <div id="systemResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Processing request...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let authToken = localStorage.getItem('authToken');
+        
+        // Update auth status on page load
+        updateAuthStatus();
+        
+        function updateAuthStatus() {
+            const statusElement = document.getElementById('authStatus');
+            if (authToken) {
+                statusElement.textContent = 'Authenticated ✓';
+                statusElement.className = 'auth-status authenticated';
+            } else {
+                statusElement.textContent = 'Not Authenticated';
+                statusElement.className = 'auth-status unauthenticated';
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+        
+        function displayResponse(elementId, response, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${isSuccess ? 'status-success' : 'status-error'}`;
+            element.textContent = JSON.stringify(response, null, 2);
+        }
+        
+        async function makeRequest(endpoint, options = {}) {
+            showLoading();
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (authToken && !options.skipAuth) {
+                headers.Authorization = `Bearer ${authToken}`;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+                
+                const data = await response.json();
+                hideLoading();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                hideLoading();
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+        
+        // Authentication Functions
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+            
+            const result = await makeRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+                skipAuth: true
+            });
+            
+            if (result.success && result.data.token) {
+                authToken = result.data.token;
+                localStorage.setItem('authToken', authToken);
+                updateAuthStatus();
+            }
+            
+            displayResponse('authResponse', result, result.success);
+        }
+        
+        function setDemoCredentials() {
+            document.getElementById('email').value = 'demo@example.com';
+            document.getElementById('password').value = 'demopassword';
+        }
+        
+        function clearAuth() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            updateAuthStatus();
+            document.getElementById('authResponse').style.display = 'none';
+        }
+        
+        function showStoredToken() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                displayResponse('authResponse', { stored_token: token }, true);
+            } else {
+                displayResponse('authResponse', { message: 'No token stored' }, false);
+            }
+        }
+        
+        async function testProtectedEndpoint() {
+            const result = await makeRequest('/user/urls');
+            displayResponse('authResponse', result, result.success);
+        }
+        
+        // URL Shortening Functions
+        async function shortenUrl() {
+            const originalUrl = document.getElementById('originalUrl').value;
+            
+            if (!originalUrl) {
+                alert('Please enter a URL to shorten');
+                return;
+            }
+            
+            const result = await makeRequest('/shorten', {
+                method: 'POST',
+                body: JSON.stringify({ original_url: originalUrl }),
+                skipAuth: true
+            });
+            
+            if (result.success && result.data.short_code) {
+                document.getElementById('shortCode').value = result.data.short_code;
+            }
+            
+            displayResponse('shortenResponse', result, result.success);
+        }
+        
+        async function shortenUrlAuthenticated() {
+            const originalUrl = document.getElementById('originalUrl').value;
+            
+            if (!originalUrl) {
+                alert('Please enter a URL to shorten');
+                return;
+            }
+            
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            const result = await makeRequest('/shorten', {
+                method: 'POST',
+                body: JSON.stringify({ original_url: originalUrl })
+            });
+            
+            if (result.success && result.data.short_code) {
+                document.getElementById('shortCode').value = result.data.short_code;
+            }
+            
+            displayResponse('shortenResponse', result, result.success);
+        }
+        
+        function setDemoUrl() {
+            document.getElementById('originalUrl').value = 'https://www.google.com';
+        }
+        
+        function generateRandomUrl() {
+            const domains = ['example.com', 'test.org', 'demo.net', 'sample.io'];
+            const paths = ['page', 'article', 'blog', 'news', 'info'];
+            const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+            const randomPath = paths[Math.floor(Math.random() * paths.length)];
+            const randomId = Math.floor(Math.random() * 1000);
+            
+            document.getElementById('originalUrl').value = `https://${randomDomain}/${randomPath}/${randomId}`;
+        }
+        
+        // URL Management Functions
+        async function getUserUrls() {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            const result = await makeRequest('/user/urls');
+            displayResponse('managementResponse', result, result.success);
+        }
+        
+        async function redirectTest() {
+            const shortCode = document.getElementById('shortCode').value;
+            
+            if (!shortCode) {
+                alert('Please enter a short code');
+                return;
+            }
+            
+            const result = await makeRequest(`/${shortCode}`, { skipAuth: true });
+            displayResponse('managementResponse', result, result.success);
+        }
+        
+        async function updateUrl() {
+            const shortCode = document.getElementById('shortCode').value;
+            const newUrl = document.getElementById('newUrl').value;
+            
+            if (!shortCode || !newUrl) {
+                alert('Please enter both short code and new URL');
+                return;
+            }
+            
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            const result = await makeRequest(`/user/urls/${shortCode}`, {
+                method: 'PUT',
+                body: JSON.stringify({ original_url: newUrl })
+            });
+            
+            displayResponse('managementResponse', result, result.success);
+        }
+        
+        async function deleteUrl() {
+            const shortCode = document.getElementById('shortCode').value;
+            
+            if (!shortCode) {
+                alert('Please enter a short code');
+                return;
+            }
+            
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to delete this URL?')) {
+                return;
+            }
+            
+            const result = await makeRequest(`/user/urls/${shortCode}`, {
+                method: 'DELETE'
+            });
+            
+            displayResponse('managementResponse', result, result.success);
+        }
+        
+        // System Functions
+        async function healthCheck() {
+            const result = await makeRequest('/health', { skipAuth: true });
+            displayResponse('systemResponse', result, result.success);
+        }
+        
+        async function getMetrics() {
+            const result = await makeRequest('/metrics', { skipAuth: true });
+            displayResponse('systemResponse', result, result.success);
+        }
+        
+        function openSwaggerDocs() {
+            window.open(`${API_BASE}/api-docs`, '_blank');
+        }
+        
+        // Initialize page
+        console.log('🚀 Shortener API Tester initialized');
+        console.log('API Base URL:', API_BASE);
+        console.log('Auth Token:', authToken ? 'Present' : 'Not set');
+    </script>
+</body>
+</html>

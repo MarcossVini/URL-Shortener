@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Shortener API - Interactive Documentation</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAA7ElEQVRYhe2WQQ6CMBBFXwMbE09gYuIJPAGJiSfwBCYmnsATmJh4Ak9gYuIJPAGJiSewMfEEbEw8gYmJJ/AEJiYewMbEE5CYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7AE5iYeAJPYGLiCTyBiYkn8AQmJp7A"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Custom Header */
+        .custom-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .custom-header h1 {
+            margin: 0;
+            color: #667eea;
+            font-size: 2.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .custom-header p {
+            margin: 10px 0 0 0;
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        /* Swagger UI Customizations */
+        #swagger-ui {
+            background: white;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .swagger-ui .topbar { 
+            display: none; 
+        }
+        
+        .swagger-ui .info { 
+            margin: 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .swagger-ui .info .title { 
+            color: #667eea; 
+            font-size: 2.5em; 
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .swagger-ui .info .description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+        
+        .swagger-ui .scheme-container {
+            background: #667eea;
+            padding: 20px;
+            color: white;
+        }
+        
+        .swagger-ui .opblock.opblock-post {
+            border-color: #10b981;
+        }
+        
+        .swagger-ui .opblock.opblock-get {
+            border-color: #3b82f6;
+        }
+        
+        .swagger-ui .opblock.opblock-put {
+            border-color: #f59e0b;
+        }
+        
+        .swagger-ui .opblock.opblock-delete {
+            border-color: #ef4444;
+        }
+        
+        .swagger-ui .btn.authorize {
+            background: #667eea;
+            border-color: #667eea;
+        }
+        
+        .swagger-ui .btn.authorize:hover {
+            background: #5a67d8;
+            border-color: #5a67d8;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .custom-header h1 {
+                font-size: 1.8em;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .status-badge {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            #swagger-ui {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header -->
+    <div class="custom-header">
+        <h1>
+            🚀 Shortener API
+            <span class="status-badge">✅ Live</span>
+        </h1>
+        <p>Complete URL shortening service with JWT authentication and real-time analytics</p>
+    </div>
+    
+    <!-- Swagger UI Container -->
+    <div id="swagger-ui">
+        <div class="loading">Loading API Documentation</div>
+    </div>
+    
+    <!-- Swagger UI Scripts -->
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    
+    <script>
+        window.onload = function() {
+            // Get current URL to build API endpoint
+            const currentUrl = window.location.origin;
+            const specUrl = currentUrl + '/api-docs/swagger.json';
+            
+            console.log('🔧 Initializing Swagger UI...');
+            console.log('📡 API Spec URL:', specUrl);
+            
+            // Initialize Swagger UI
+            const ui = SwaggerUIBundle({
+                url: specUrl,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                persistAuthorization: true,
+                displayRequestDuration: true,
+                filter: true,
+                showExtensions: true,
+                showCommonExtensions: true,
+                tryItOutEnabled: true,
+                requestInterceptor: function(request) {
+                    console.log('📤 API Request:', request.method, request.url);
+                    return request;
+                },
+                responseInterceptor: function(response) {
+                    console.log('📥 API Response:', response.status, response.url);
+                    return response;
+                },
+                onComplete: function() {
+                    console.log('✅ Swagger UI loaded successfully!');
+                    
+                    // Add custom styles after load
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .swagger-ui .info .title::after {
+                            content: ' 🔗';
+                        }
+                        .swagger-ui .auth-wrapper {
+                            display: flex;
+                            justify-content: center;
+                            margin: 20px 0;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                },
+                onFailure: function(error) {
+                    console.error('❌ Failed to load Swagger UI:', error);
+                    document.getElementById('swagger-ui').innerHTML = `
+                        <div style="text-align: center; padding: 50px; color: #ef4444;">
+                            <h2>❌ Failed to load API documentation</h2>
+                            <p>Error: ${error.message || 'Unknown error'}</p>
+                            <p>Please check if the API is running and accessible.</p>
+                            <button onclick="location.reload()" style="
+                                background: #667eea; 
+                                color: white; 
+                                border: none; 
+                                padding: 10px 20px; 
+                                border-radius: 5px; 
+                                cursor: pointer;
+                                font-size: 16px;
+                                margin-top: 20px;
+                            ">🔄 Retry</button>
+                        </div>
+                    `;
+                }
+            });
+            
+            // Global error handler
+            window.addEventListener('error', function(e) {
+                console.error('❌ Global error:', e.error);
+            });
+        };
+    </script>
+</body>
+</html>

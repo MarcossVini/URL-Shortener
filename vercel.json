@@ -8,11 +8,51 @@
   ],
   "routes": [
     {
+      "src": "/api-docs/(.*)",
+      "dest": "/api"
+    },
+    {
+      "src": "/health",
+      "dest": "/api"
+    },
+    {
+      "src": "/metrics",
+      "dest": "/api"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "/api"
+    },
+    {
+      "src": "/shorten/(.*)",
+      "dest": "/api"
+    },
+    {
+      "src": "/user/(.*)",
+      "dest": "/api"
+    },
+    {
       "src": "/(.*)",
       "dest": "/api"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1"],
+  "rewrites": [
+    {
+      "source": "/api-docs",
+      "destination": "/api-docs"
+    },
+    {
+      "source": "/swagger.json",
+      "destination": "/api-docs/swagger.json"
+    }
+  ]
 }

@@ -64,28 +64,29 @@ app.use(metricsMiddleware);
 // Swagger Documentation - Available in all environments
 // Serve static files first for Swagger UI assets
 if (process.env.VERCEL) {
-  // In serverless environment, create custom swagger UI HTML
+  // In serverless environment, serve custom swagger UI HTML
   app.get('/api-docs', (req, res) => {
-    const html = `
+    const fs = require('fs');
+    const path = require('path');
+
+    try {
+      const htmlPath = path.join(process.cwd(), 'public', 'swagger-ui-custom.html');
+      const html = fs.readFileSync(htmlPath, 'utf8');
+      res.set('Content-Type', 'text/html').send(html);
+    } catch (error) {
+      console.error('Error serving custom Swagger UI:', error);
+      // Fallback to basic swagger UI
+      const html = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Shortener API Documentation</title>
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
     <style>
-      html {
-        box-sizing: border-box;
-        overflow: -moz-scrollbars-vertical;
-        overflow-y: scroll;
-      }
-      *, *:before, *:after {
-        box-sizing: inherit;
-      }
-      body {
-        margin:0;
-        background: #fafafa;
-      }
+      html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+      *, *:before, *:after { box-sizing: inherit; }
+      body { margin:0; background: #fafafa; }
       .swagger-ui .topbar { display: none; }
       .swagger-ui .info { margin: 50px 0; }
       .swagger-ui .info .title { color: #3b82f6; font-size: 36px; }
@@ -93,17 +94,61 @@ if (process.env.VERCEL) {
   </head>
   <body>
     <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-standalone-preset.js"></script>
-    <script src="/swagger-init.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+      window.onload = function () {
+        const ui = SwaggerUIBundle({
+          url: window.location.origin + '/api-docs/swagger.json',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+          layout: 'StandaloneLayout',
+          persistAuthorization: true,
+          displayRequestDuration: true,
+          filter: true,
+          showExtensions: true,
+          showCommonExtensions: true,
+        });
+      };
+    </script>
   </body>
 </html>`;
-    res.set('Content-Type', 'text/html').send(html);
+      res.set('Content-Type', 'text/html').send(html);
+    }
   });
 
   // Serve the OpenAPI spec as JSON
   app.get('/api-docs/swagger.json', (req, res) => {
     res.set('Content-Type', 'application/json').send(specs);
+  });
+
+  // Health check with database connection test
+  app.get('/api-docs/health', async (req, res) => {
+    try {
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+
+      // Test database connection
+      await prisma.$queryRaw`SELECT 1`;
+      await prisma.$disconnect();
+
+      res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        database: 'connected',
+        environment: process.env.NODE_ENV || 'production',
+      });
+    } catch (error) {
+      console.error('Health check failed:', error);
+      res.status(503).json({
+        status: 'ERROR',
+        timestamp: new Date().toISOString(),
+        database: 'disconnected',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
   });
 } else {
   // In development, use the standard swagger-ui-express

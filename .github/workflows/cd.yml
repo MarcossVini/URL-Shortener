@@ -67,5 +67,31 @@ jobs:
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npx vercel --prod --yes --token $VERCEL_TOKEN
+          echo "🚀 Deploying to Vercel..."
+          npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
+          npx vercel build --prod --token $VERCEL_TOKEN
+          npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
+
+      - name: Verify Deployment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "🔍 Verifying deployment..."
+          DEPLOYMENT_URL=$(npx vercel ls --token $VERCEL_TOKEN | head -2 | tail -1 | awk '{print $2}')
+          echo "Deployment URL: https://$DEPLOYMENT_URL"
+
+          # Wait for deployment to be ready
+          sleep 10
+
+          # Health check
+          if curl -f -s "https://$DEPLOYMENT_URL/health" > /dev/null; then
+            echo "✅ Health check passed"
+            echo "📚 Swagger UI: https://$DEPLOYMENT_URL/api-docs"
+            echo "📊 Metrics: https://$DEPLOYMENT_URL/metrics"
+          else
+            echo "❌ Health check failed"
+            exit 1
+          fi

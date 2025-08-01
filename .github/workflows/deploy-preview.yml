@@ -1,0 +1,113 @@
+name: Deploy Preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy-preview:
+    name: 'Deploy to Vercel Preview'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Generate Prisma Client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma generate
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Deploy to Vercel Preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          echo "🚀 Deploying preview to Vercel..."
+          npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
+          npx vercel build --token $VERCEL_TOKEN
+          DEPLOYMENT_URL=$(npx vercel deploy --prebuilt --token $VERCEL_TOKEN)
+          echo "Preview URL: $DEPLOYMENT_URL"
+
+      - name: Verify Preview Deployment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          echo "🔍 Verifying preview deployment..."
+          DEPLOYMENT_URL=$(npx vercel ls --token $VERCEL_TOKEN | head -2 | tail -1 | awk '{print $2}')
+
+          # Wait for deployment to be ready
+          sleep 10
+
+          # Health check
+          if curl -f -s "https://$DEPLOYMENT_URL/health" > /dev/null; then
+            echo "✅ Preview health check passed"
+            echo "🔗 Preview URL: https://$DEPLOYMENT_URL"
+            echo "📚 Preview Swagger: https://$DEPLOYMENT_URL/api-docs"
+            echo "🧪 Preview Tester: https://$DEPLOYMENT_URL/api-tester-advanced.html"
+          else
+            echo "⚠️ Preview health check failed - deployment may still be starting"
+          fi
+
+      - name: Comment PR with Preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            try {
+              const output = execSync('npx vercel ls --token ${{ secrets.VERCEL_TOKEN }}', { encoding: 'utf8' });
+              const lines = output.split('\n');
+              const deploymentUrl = lines[1] ? lines[1].split(/\s+/)[1] : null;
+              
+              if (deploymentUrl) {
+                const body = `
+            ## 🚀 Preview Deployment Ready!
+
+            Your changes have been deployed to a preview environment:
+
+            - **🔗 Preview URL**: https://${deploymentUrl}
+            - **📚 API Documentation**: https://${deploymentUrl}/api-docs
+            - **🧪 Interactive Tester**: https://${deploymentUrl}/api-tester-advanced.html
+            - **🏥 Health Check**: https://${deploymentUrl}/health
+            - **📊 Metrics**: https://${deploymentUrl}/metrics
+
+            The preview will be updated automatically with new commits to this PR.
+                `;
+                
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: body
+                });
+              }
+            } catch (error) {
+              console.log('Could not get deployment URL:', error.message);
+            }
